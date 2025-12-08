@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { query } from './db/connection';
 
 dotenv.config();
 
@@ -16,12 +17,26 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/health', (req: Request, res: Response) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-  });
+app.get('/health', async (req: Request, res: Response) => {
+  try {
+    const result = await query('SELECT NOW()');
+
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      database: 'connected',
+      dbTime: result.rows[0].now,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      database: 'disconnected',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 });
 
 app.get('/api', (req: Request, res: Response) => {
