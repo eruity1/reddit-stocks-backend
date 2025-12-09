@@ -16,7 +16,7 @@ Backend API for tracking stock mentions and sentiment across Reddit investing co
 
 ```bash
 git clone git@github.com:eruity1/reddit-stocks-backend.git
-cd reddit-stock-tracker-api
+cd reddit-stocks-backend
 ```
 
 1.  Install dependencies
