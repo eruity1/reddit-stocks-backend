@@ -97,6 +97,40 @@ export const analyzeSentiment = (text: string): SentimentResult => {
   };
 };
 
+export const analyzeBatchSentiment = (
+  texts: string[]
+): {
+  averageScore: number;
+  averageNormalized: number;
+  results: SentimentResult[];
+} => {
+  const results = texts.map((text) => analyzeSentiment(text));
+
+  const averageScore = results.reduce((sum, res) => sum + res.score, 0) / results.length || 0;
+  const averageNormalized =
+    results.reduce((sum, res) => sum + res.normalizedScore, 0) / results.length || 0;
+
+  return {
+    averageScore,
+    averageNormalized,
+    results,
+  };
+};
+
+export const getTickerSentiment = (text: string, ticker: string): SentimentResult => {
+  const sentences = text.split(/[.!?]+/);
+  const relevantSentences = sentences.filter((sentence) =>
+    sentence.toUpperCase().includes(ticker.toUpperCase())
+  );
+
+  if (relevantSentences.length === 0) {
+    return analyzeSentiment(text);
+  }
+
+  const combinedText = relevantSentences.join('. ');
+  return analyzeSentiment(combinedText);
+};
+
 const cleanText = (text: string): string => {
   return text
     .toLowerCase()
@@ -118,4 +152,10 @@ const getSentimentLabel = (score: number): SentimentResult['label'] => {
   if (score <= -0.5) return 'very negative';
   if (score <= -0.15) return 'negative';
   return 'neutral';
+};
+
+export default {
+  analyzeSentiment,
+  analyzeBatchSentiment,
+  getTickerSentiment,
 };

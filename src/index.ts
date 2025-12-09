@@ -1,7 +1,10 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+
 import { query } from './db/connection';
+import sentimentRoutes from './routes/sentiment';
+import config from './config';
 
 dotenv.config();
 
@@ -10,8 +13,10 @@ const PORT = process.env.PORT || 3001;
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: config.frontendUrl,
     credentials: true,
+    methods: ['GET', 'POST', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 app.use(express.json());
@@ -24,7 +29,7 @@ app.get('/health', async (req: Request, res: Response) => {
     res.json({
       status: 'ok',
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
+      environment: config.nodeEnv,
       database: 'connected',
       dbTime: result.rows[0].now,
     });
@@ -32,7 +37,7 @@ app.get('/health', async (req: Request, res: Response) => {
     res.status(500).json({
       status: 'error',
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
+      environment: config.nodeEnv,
       database: 'disconnected',
       error: error instanceof Error ? error.message : 'Unknown error',
     });
@@ -46,11 +51,13 @@ app.get('/api', (req: Request, res: Response) => {
   });
 });
 
+app.use('/api/sentiment', sentimentRoutes);
+
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhose::${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+app.listen(config.port, () => {
+  console.log(`Server running on http://localhose::${config.port}`);
+  console.log(`Environment: ${config.port || 'development'}`);
 });
