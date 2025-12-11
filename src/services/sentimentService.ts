@@ -64,6 +64,7 @@ const stockLexicon = {
   'rug': -3,
   'scam': -3,
   'downtrend': -2,
+  'growing concerns': -2,
 };
 
 export const analyzeSentiment = (text: string): SentimentResult => {
@@ -147,9 +148,9 @@ const normalizeScore = (comparative: number): number => {
 };
 
 const getSentimentLabel = (score: number): SentimentResult['label'] => {
-  if (score >= 0.5) return 'very positive';
-  if (score >= 0.15) return 'neutral';
-  if (score <= -0.5) return 'very negative';
+  if (score >= 0.7) return 'very positive';
+  if (score >= 0.15) return 'positive';
+  if (score <= -0.7) return 'very negative';
   if (score <= -0.15) return 'negative';
   return 'neutral';
 };

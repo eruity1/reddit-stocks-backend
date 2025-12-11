@@ -3,7 +3,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import { query } from './db/connection';
-import sentimentRoutes from './routes/sentiment';
 import config from './config';
 
 dotenv.config();
@@ -50,8 +49,6 @@ app.get('/api', (req: Request, res: Response) => {
     version: '1.0.0',
   });
 });
-
-app.use('/api/sentiment', sentimentRoutes);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({ error: 'Route not found' });
